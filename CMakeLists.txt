@@ -14,20 +14,33 @@ find_package(TinyXML REQUIRED)
 find_package( OpenCV REQUIRED )
 message("Open CV version is ${OpenCV_VERSION}")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") 
+
+
+
 find_package(CUDA REQUIRED)
 include_directories(${CUDA_INCLUDE_DIRS})
 # Note: If can't find CUDA, please uncomment the below line and set the path manually
 # set(CUDA_INCLUDE_DIRS /path_to_cuda/include)
 
-find_package(Caffe REQUIRED)
-include_directories(${Caffe_INCLUDE_DIRS})
-add_definitions(${Caffe_DEFINITIONS})    # ex. -DCPU_ONLY
-message("Caffe_DIR is ${Caffe_DIR}")	#specify Caffe_DIR in /cmake/Modules/FindCaffe.cmake
+set(CAFFE_INCLUDEDIR 
+  $ENV{CAFFE_ROOT}/include 
+  $ENV{CAFFE_ROOT}/distribute/include 
+  $ENV{CAFFE_ROOT}/build/include)
+set(CAFFE_LINK_LIBRARAY 
+  $ENV{CAFFE_ROOT}/build/lib)
+include_directories(${CAFFE_INCLUDEDIR})
+
+# find_package(Caffe REQUIRED)
+# include_directories(${Caffe_INCLUDE_DIRS})
+# add_definitions(${Caffe_DEFINITIONS})    # ex. -DCPU_ONLY
+# message("Caffe_DIR is ${Caffe_DIR}")	#specify Caffe_DIR in /cmake/Modules/FindCaffe.cmake
 # Note: If can't find Caffe, please uncomment the below line and set the path manually
 # set(Caffe_DIR /path_to_caffe/build/install)
 # set(Caffe_INCLUDE_DIRS /path_to_caffe/build/install/include)
 
 set(GLOG_LIB glog)
+set(Caffe_LIBRARIES caffe)
 
 add_library (${PROJECT_NAME}
 src/helper/bounding_box.cpp
@@ -70,6 +83,7 @@ src/native/vot.h
 )
 
 # Add src to include directories.
+link_directories(${CAFFE_LINK_LIBRARAY})
 include_directories(src)
 include_directories(src/native)
 
@@ -81,6 +95,11 @@ include_directories(src/native)
 add_executable (test_tracker_vot src/test/test_tracker_vot.cpp)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${Caffe_LIBRARIES} ${GLOG_LIB})
 target_link_libraries (test_tracker_vot ${PROJECT_NAME})
+
+add_executable (test_tracker_video src/test/test_tracker_video.cpp)
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${Caffe_LIBRARIES} ${GLOG_LIB})
+target_link_libraries (test_tracker_video ${PROJECT_NAME})
+
 # Note: If can't find trax, please download trax and build it, then uncomment the below line and set the path manually
 # target_link_libraries(${PROJECT_NAME} /path_to_trax/build/libtrax.so)
 

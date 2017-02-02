@@ -46,12 +46,19 @@ void Tracker::Track(const cv::Mat& image_curr, RegressorBase* regressor,
   cv::Mat target_pad;
   CropPadImage(bbox_prev_tight_, image_prev_, &target_pad);
 
+  std::cout << "PREV_BBOX:"  << "\n";
+  bbox_prev_tight_.Print();
+  
+
   // Crop the current image based on predicted prior location of target.
   cv::Mat curr_search_region;
   BoundingBox search_location;
   double edge_spacing_x, edge_spacing_y;
   CropPadImage(bbox_curr_prior_tight_, image_curr, &curr_search_region, &search_location, &edge_spacing_x, &edge_spacing_y);
 
+  cv::imshow("crop", curr_search_region);
+  
+  
   // Estimate the bounding box location of the target, centered and scaled relative to the cropped image.
   BoundingBox bbox_estimate;
   regressor->Regress(image_curr, curr_search_region, target_pad, &bbox_estimate);

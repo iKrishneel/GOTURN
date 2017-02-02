@@ -1,0 +1,4 @@
+*~
+build/
+nets/tracker_output
+nets/models
